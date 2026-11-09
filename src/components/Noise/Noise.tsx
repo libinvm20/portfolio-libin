@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { getTier } from '../perf/LoopManager';
 
 export interface NoiseProps {
   patternScaleX?: number;
@@ -25,6 +26,11 @@ export default function Noise({
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return undefined;
 
+    // Low tier (phones, low-RAM machines) gets one static grain field: a
+    // full-viewport blended canvas repaint is compositing cost with almost no
+    // visible payoff on a small screen.
+    const animate = getTier() === 'high';
+
     const tile = 250;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tile}" height="${tile}">
       <filter id="n">
@@ -38,30 +44,38 @@ export default function Noise({
     let frame = 0;
     let raf = 0;
 
-    image.onload = () => {
-      pattern = ctx.createPattern(image, 'repeat');
-      URL.revokeObjectURL(url);
+    const draw = () => {
+      if (!pattern) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = Math.min(1, Math.max(0, patternAlpha / 100));
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
-    image.src = url;
 
     const resize = () => {
       canvas.width = Math.ceil(window.innerWidth * (patternScaleX || 1));
       canvas.height = Math.ceil(window.innerHeight * (patternScaleY || 1));
       ctx.fillStyle = '#000';
+      draw();
     };
     resize();
     window.addEventListener('resize', resize);
 
     const tick = () => {
       raf = requestAnimationFrame(tick);
+      if (document.hidden) return;
       frame += 1;
-      if (frame % Math.max(1, patternRefreshInterval) !== 0 || !pattern) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalAlpha = Math.min(1, Math.max(0, patternAlpha / 100));
-      ctx.fillStyle = pattern;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (frame % Math.max(1, patternRefreshInterval) !== 0) return;
+      draw();
     };
-    tick();
+
+    image.onload = () => {
+      pattern = ctx.createPattern(image, 'repeat');
+      URL.revokeObjectURL(url);
+      draw();
+      if (animate) tick();
+    };
+    image.src = url;
 
     return () => {
       cancelAnimationFrame(raf);

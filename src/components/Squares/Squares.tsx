@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { getTier } from '../perf/LoopManager';
 
 export interface SquaresProps {
   squareSize?: number;
@@ -34,6 +35,11 @@ export default function Squares({
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [hovered, setHovered] = useState(-1);
 
+  // Phones get fewer, larger cells (less paint area, far fewer nodes) and a
+  // static grid — hundreds of independently animated boxes are not free.
+  const cellSize = size.width > 0 && size.width < 640 ? Math.max(squareSize, 56) : squareSize;
+  const pulse = getTier() === 'high';
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
@@ -47,20 +53,23 @@ export default function Squares({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
+    // Pointer-proximity fill is a hover affordance — pointless (and jittery
+    // during scroll) on touch, so it is only wired up for a fine pointer.
+    if (!window.matchMedia('(pointer: fine)').matches) return undefined;
     const onMove = (event: PointerEvent) => {
       const rect = container.getBoundingClientRect();
-      const x = Math.floor((event.clientX - rect.left) / squareSize);
-      const y = Math.floor((event.clientY - rect.top) / squareSize);
-      setHovered(y * Math.max(1, Math.ceil((size.width + squareSize) / squareSize)) + x >= 0 ? y * Math.ceil((size.width + squareSize) / squareSize) + x : -1);
+      const x = Math.floor((event.clientX - rect.left) / cellSize);
+      const y = Math.floor((event.clientY - rect.top) / cellSize);
+      setHovered(y * Math.max(1, Math.ceil((size.width + cellSize) / cellSize)) + x >= 0 ? y * Math.ceil((size.width + cellSize) / cellSize) + x : -1);
     };
     window.addEventListener('pointermove', onMove, { passive: true });
     return () => window.removeEventListener('pointermove', onMove);
-  }, [size.width, size.height, squareSize]);
+  }, [size.width, size.height, cellSize]);
 
   const squares = useMemo(() => {
     if (size.width === 0 || size.height === 0) return [];
-    const cols = Math.ceil(size.width / squareSize) + 1;
-    const rows = Math.ceil(size.height / squareSize) + 1;
+    const cols = Math.ceil(size.width / cellSize) + 1;
+    const rows = Math.ceil(size.height / cellSize) + 1;
     const depth = DEPTH[direction] ?? DEPTH.diagonal;
     const cells: { key: number; col: number; row: number; delay: number; left: number; top: number }[] = [];
     for (let row = 0; row < rows; row += 1) {
@@ -70,13 +79,13 @@ export default function Squares({
           col,
           row,
           delay: depth(col, row) / Math.max(0.05, speed),
-          left: col * squareSize,
-          top: row * squareSize
+          left: col * cellSize,
+          top: row * cellSize
         });
       }
     }
     return cells;
-  }, [size, squareSize, direction, speed]);
+  }, [size, cellSize, direction, speed]);
 
   return (
     <div ref={containerRef} aria-hidden="true" className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
@@ -88,12 +97,12 @@ export default function Squares({
           style={{
             left: cell.left,
             top: cell.top,
-            width: squareSize,
-            height: squareSize,
+            width: cellSize,
+            height: cellSize,
             borderTop: `1px solid ${borderColor}`,
             borderLeft: `1px solid ${borderColor}`,
-            animation: 'squares-pulse 3.4s ease-in-out infinite',
-            animationDelay: `-${cell.delay}s`,
+            animation: pulse ? 'squares-pulse 3.4s ease-in-out infinite' : undefined,
+            animationDelay: pulse ? `-${cell.delay}s` : undefined,
             backgroundColor: cell.key === hovered ? hoverFillColor : 'transparent'
           }}
         />

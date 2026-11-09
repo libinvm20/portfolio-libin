@@ -6,8 +6,8 @@ import { profile, focusAreas } from '../../data'
 
 export default function About() {
   return (
-    <section id="about" className="scroll-mt-24 py-20 md:py-28">
-      <div className="container-x grid items-center gap-10 md:grid-cols-[auto,1fr] md:gap-14">
+    <section id="about" className="scroll-mt-24 py-16 sm:py-20 md:py-28">
+      <div className="container-x grid items-center gap-8 md:grid-cols-[auto,1fr] md:gap-14">
         <div className="flex justify-center md:justify-start">
           <AnimatedContent distance={30} duration={0.7} blur={4}>
             <PixelCard variant="top" gap={22} speed={40} colors={['#6d72c3', '#a9a3d8']} className="rounded-[2rem]">

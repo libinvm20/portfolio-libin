@@ -79,11 +79,21 @@ export interface BootScreenProps {
 export default function BootScreen({ onDone }: BootScreenProps) {
   const [phase, setPhase] = useState<Phase>('boot')
   const [statusIndex, setStatusIndex] = useState(0)
+  const [skipped, setSkipped] = useState(false)
   const leaving = phase !== 'boot'
   const doneRef = useRef(onDone)
+  const finishedRef = useRef(false)
+  const finishRef = useRef(() => {})
+  const skipTimer = useRef(0)
 
   useEffect(() => {
     doneRef.current = onDone
+    // Idempotent completion: the timeline, a skip tap and unmount can all race.
+    finishRef.current = () => {
+      if (finishedRef.current) return
+      finishedRef.current = true
+      doneRef.current()
+    }
   })
 
   // Freeze page scroll while the overlay is up.
@@ -96,6 +106,16 @@ export default function BootScreen({ onDone }: BootScreenProps) {
     }
   }, [])
 
+  // Tap (or keyboard-activate) the skip button to drop straight to the page.
+  const skip = () => {
+    if (finishedRef.current || skipped) return
+    setSkipped(true)
+    setPhase('open')
+    skipTimer.current = window.setTimeout(() => finishRef.current(), 220)
+  }
+
+  useEffect(() => () => window.clearTimeout(skipTimer.current), [])
+
   // The entire timeline is scheduled up front; phase state only steers the
   // visuals. onDone is read through a ref so a fresh callback identity from
   // the parent can never restart this effect.
@@ -104,7 +124,7 @@ export default function BootScreen({ onDone }: BootScreenProps) {
       window.setTimeout(() => setPhase('exit'), HOLD_MS),
       window.setTimeout(() => setPhase('shutter'), HOLD_MS + EXIT_MS),
       window.setTimeout(() => setPhase('open'), COVERED_AT),
-      window.setTimeout(() => doneRef.current(), DONE_AT),
+      window.setTimeout(() => finishRef.current(), DONE_AT),
     ]
     const statuses = window.setInterval(() => {
       setStatusIndex(index => (index + 1) % STATUS_LINES.length)
@@ -129,7 +149,13 @@ export default function BootScreen({ onDone }: BootScreenProps) {
       role="status"
       aria-label="Loading portfolio"
       data-phase={phase}
-      style={phase === 'open' ? { background: 'transparent' } : undefined}
+      data-skipped={skipped || undefined}
+      style={{
+        ...(phase === 'open' ? { background: 'transparent' } : null),
+        opacity: skipped ? 0 : 1,
+        pointerEvents: skipped ? 'none' : undefined,
+        transition: 'opacity 0.22s ease',
+      }}
     >
       {phase !== 'open' && (
         <>
@@ -220,6 +246,9 @@ export default function BootScreen({ onDone }: BootScreenProps) {
           />
         ))}
       </div>
+      <button type="button" className="boot__skip" onClick={skip}>
+        skip intro
+      </button>
     </div>
   )
 }

@@ -38,8 +38,8 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-veil/40 via-transparent to-veil" />
       </div>
 
-      <div className="container-x relative z-10 flex flex-col items-center gap-6 pt-28 pb-20 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-[#a9a3d8]/40 bg-[#1d1128]/70 px-3 py-1.5 font-mono text-[0.8rem] text-[#c7bbe2] shadow-[0_0_26px_rgba(29,17,40,0.65)] backdrop-blur-md">
+      <div className="container-x relative z-10 flex flex-col items-center gap-5 pt-24 pb-24 text-center sm:gap-6 sm:pt-28 sm:pb-20">
+        <span className="inline-flex max-w-[92%] items-center gap-2 rounded-full border border-[#a9a3d8]/40 bg-[#1d1128]/70 px-3 py-1.5 text-center font-mono text-[0.7rem] leading-snug text-[#c7bbe2] shadow-[0_0_26px_rgba(29,17,40,0.65)] backdrop-blur-md sm:text-[0.8rem]">
           <span className="inline-block size-1.5 animate-pulse rounded-full bg-[#a9a3d8]" />
           building right now — LykCloud &amp; ShiftAPI
         </span>
@@ -71,11 +71,11 @@ export default function Hero() {
           </span>
         </GradientText>
 
-        <p className="max-w-[60ch] text-[clamp(0.95rem,2.5vw,1.1rem)] leading-relaxed text-[#c7bbe2] [text-shadow:0_1px_14px_rgba(29,17,40,0.85)]">
+        <p className="max-w-[60ch] text-pretty text-[clamp(0.95rem,2.5vw,1.1rem)] leading-relaxed text-[#c7bbe2] [text-shadow:0_1px_14px_rgba(29,17,40,0.85)]">
           {profile.tagline}
         </p>
 
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 sm:mt-4 sm:gap-4">
           <Magnet magnetStrength={1.6} padding={64}>
             <motion.div
             whileHover={{ y: -3, scale: 1.03, boxShadow: '0 10px 30px -10px rgba(109, 114, 195, 0.55)' }}
@@ -111,7 +111,7 @@ export default function Hero() {
                 href={profile.links.github}
                 target="_blank"
                 rel="noreferrer"
-                className="block rounded-xl border border-[#a9a3d8]/35 bg-[#1d1128]/65 px-6 py-2.5 font-semibold text-[#c7bbe2] backdrop-blur-md transition-colors hover:border-[#a9a3d8]/60 hover:text-ink"
+                className="flex min-h-11 items-center justify-center rounded-xl border border-[#a9a3d8]/35 bg-[#1d1128]/65 px-6 py-2.5 font-semibold text-[#c7bbe2] backdrop-blur-md transition-colors hover:border-[#a9a3d8]/60 hover:text-ink active:border-[#a9a3d8]/70 active:bg-[#241733]"
               >
                 GitHub →
               </a>
@@ -123,7 +123,7 @@ export default function Hero() {
       </div>
 
       {/* kinetic strip — outlined display type drifting across the hero floor */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 pb-3">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 pb-2 sm:pb-3">
         <ScrollVelocity
           texts={[
             <span

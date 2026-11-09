@@ -95,13 +95,45 @@
 
 .boot__status {
   position: relative;
-  min-width: 300px;
+  width: min(300px, 100%);
   height: 15px;
   text-align: center;
   font: 600 10px / 15px 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   color: #8d8496;
+}
+
+/* Skip affordance: always reachable, 44px tall, clear of the home indicator. */
+.boot__skip {
+  position: absolute;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 20px;
+  border: 1px solid rgba(229, 212, 237, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #8d8496;
+  font: 600 9px / 1 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.boot__skip:active,
+.boot__skip:focus-visible {
+  color: #e5d4ed;
+  border-color: rgba(169, 163, 216, 0.55);
+  background: rgba(169, 163, 216, 0.08);
+  outline: none;
 }
 
 .boot__status-line {

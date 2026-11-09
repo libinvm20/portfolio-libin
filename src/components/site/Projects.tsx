@@ -26,19 +26,19 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         href={project.href}
         target={internal ? undefined : '_blank'}
         rel="noreferrer"
-        className="flex h-full w-full flex-col gap-3 p-6 md:p-7"
+        className="flex h-full w-full flex-col gap-3 p-5 transition-colors active:bg-white/[0.04] sm:p-6 md:p-7"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="font-display text-lg font-bold tracking-tight text-ink">{project.title}</h3>
+            <h3 className="font-display text-balance text-lg font-bold tracking-tight text-ink">{project.title}</h3>
             <p className="font-mono text-xs text-dim">{project.subtitle}</p>
           </div>
           <span className="outlined font-display text-3xl font-bold leading-none" aria-hidden="true">
             {String(index + 1).padStart(2, '0')}
           </span>
         </div>
-        <p className="text-sm leading-relaxed text-[#c7bbe2]">{project.description}</p>
-        <div className="mt-auto flex items-end justify-between gap-3 pt-2">
+        <p className="text-pretty text-sm leading-relaxed text-[#c7bbe2]">{project.description}</p>
+        <div className="mt-auto flex flex-col items-start gap-3 pt-3 sm:flex-row sm:items-end sm:justify-between sm:gap-3 sm:pt-2">
           <div className="flex flex-wrap gap-1.5">
             {project.tags.map((tag) => (
               <span key={tag} className="chip text-[0.65rem]">
@@ -46,7 +46,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               </span>
             ))}
           </div>
-          <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-primary">
+          <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary">
             {project.cta}
             <ArrowIcon />
           </span>
@@ -58,7 +58,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
 export default function Projects() {
   return (
-    <section id="projects" className="relative scroll-mt-24 py-20 md:py-28">
+    <section id="projects" className="relative scroll-mt-24 py-16 sm:py-20 md:py-28">
       <Squares squareSize={38} borderColor="rgba(229, 212, 237, 0.07)" pulseColor="rgba(109, 114, 195, 0.16)" hoverFillColor="rgba(109, 114, 195, 0.12)" className="-z-10 opacity-70" />
       <div className="container-x">
         <SectionHeader index="01" kicker="selected work" title="Things I am building">
@@ -66,7 +66,7 @@ export default function Projects() {
         </SectionHeader>
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {projects.map((project, index) => (
-            <AnimatedContent key={project.title} distance={44} duration={0.8} delay={(index % 3) * 0.08} blur={5}>
+            <AnimatedContent key={project.title} distance={34} duration={0.75} delay={(index % 3) * 0.08} blur={4}>
               <ProjectCard key={project.title} project={project} index={index} />
             </AnimatedContent>
           ))}

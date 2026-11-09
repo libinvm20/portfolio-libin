@@ -141,8 +141,24 @@ export default function SkillDonut() {
               whileInView={{ pathLength: 1, fillOpacity: active === i ? 0.4 : 0.24 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ pathLength: { duration: 0.9, delay: 0.1 + i * 0.07, ease: 'easeOut' }, fillOpacity: { duration: 0.6, delay: 0.4 + i * 0.07 } }}
-              onMouseEnter={() => setActive(i)}
-              onMouseLeave={() => setActive(null)}
+              tabIndex={0}
+              role="button"
+              aria-label={`${w.name} — ${levelWord(w.level)}, about ${w.percentInt}% of my language knowledge`}
+              onPointerEnter={event => {
+                if (event.pointerType === 'mouse') setActive(i)
+              }}
+              onPointerLeave={event => {
+                if (event.pointerType === 'mouse') setActive(null)
+              }}
+              onClick={() => setActive(current => (current === i ? null : i))}
+              onKeyDown={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  setActive(current => (current === i ? null : i))
+                }
+              }}
+              onFocus={() => setActive(i)}
+              onBlur={() => setActive(null)}
             >
               <title>{`${w.name} — ${levelWord(w.level)}, about ${w.percentInt}% of my language knowledge`}</title>
             </motion.path>
@@ -163,7 +179,7 @@ export default function SkillDonut() {
         </svg>
 
         <p className="text-center font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
-          hover a wedge or tile — self-rated depth
+          tap or hover a wedge or tile — self-rated depth
         </p>
       </div>
 
@@ -172,12 +188,18 @@ export default function SkillDonut() {
           <button
             key={w.name}
             type="button"
-            onMouseEnter={() => setActive(i)}
-            onMouseLeave={() => setActive(null)}
+            onPointerEnter={event => {
+              if (event.pointerType === 'mouse') setActive(i)
+            }}
+            onPointerLeave={event => {
+              if (event.pointerType === 'mouse') setActive(null)
+            }}
+            onClick={() => setActive(current => (current === i ? null : i))}
+            aria-pressed={active === i}
             onFocus={() => setActive(i)}
             onBlur={() => setActive(null)}
             className={[
-              'rounded-xl border p-3 text-left transition-colors duration-200',
+              'rounded-xl border p-3 text-left transition-colors duration-200 active:bg-primary/[0.1]',
               active === i ? 'border-primary/45 bg-primary/[0.07]' : 'border-line bg-white/[0.02] hover:border-white/25',
             ].join(' ')}
           >

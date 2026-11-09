@@ -114,7 +114,7 @@ function FooterLink({ item }: { item: LinkItem }) {
     <a
       href={item.href}
       {...(item.external ? { target: '_blank', rel: 'noreferrer' } : {})}
-      className="group inline-flex items-baseline gap-2 text-sm text-dim transition-colors duration-300 hover:text-ink"
+      className="group inline-flex min-h-11 items-center gap-2 py-1 text-sm text-dim transition-colors duration-300 hover:text-ink active:text-ink sm:min-h-0 sm:py-0"
     >
       <span className="relative">
         {item.label}
@@ -134,7 +134,7 @@ function LinkColumn({ title, items, delay }: { title: string; items: LinkItem[];
   return (
     <AnimatedContent distance={22} duration={0.7} delay={delay} blur={4}>
       <p className="mb-4 font-mono text-[0.66rem] uppercase tracking-[0.32em] text-primary/90">{title}</p>
-      <ul className="space-y-3.5">
+      <ul className="space-y-1 sm:space-y-3.5">
         {items.map((item) => (
           <li key={item.label}>
             <FooterLink item={item} />
@@ -176,14 +176,14 @@ function ShipNotes() {
             required
             type="email"
             placeholder="you@mail.com"
-            className="w-full min-w-0 rounded-xl border border-line bg-black/30 px-3 py-2 font-mono text-xs text-ink outline-none transition-colors duration-300 placeholder:text-dim/60 focus:border-primary/50"
+            className="min-h-11 w-full min-w-0 rounded-xl border border-line bg-black/30 px-3 py-2 font-mono text-base text-ink outline-none transition-colors duration-300 placeholder:text-dim/60 focus:border-primary/50 sm:min-h-0 sm:text-xs"
           />
           <motion.button
             type="submit"
             whileHover={{ y: -2, boxShadow: '0 8px 20px -8px rgba(109, 114, 195, 0.55)' }}
             whileTap={{ scale: 0.94 }}
             transition={{ type: 'spring', stiffness: 420, damping: 22 }}
-            className="shrink-0 rounded-xl border border-primary/40 bg-primary/15 px-3.5 py-2 font-mono text-xs text-ink transition-colors duration-300 hover:bg-primary/25"
+            className="min-h-11 shrink-0 rounded-xl border border-primary/40 bg-primary/15 px-3.5 py-2 font-mono text-sm text-ink transition-colors duration-300 hover:bg-primary/25 active:bg-primary/30 sm:min-h-0 sm:text-xs"
           >
             sub
           </motion.button>
@@ -319,7 +319,7 @@ function BrandBlock() {
               whileHover={{ y: -3, scale: 1.06 }}
               whileTap={{ scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 380, damping: 20 }}
-              className="grid size-10 place-items-center rounded-xl border border-line bg-white/[0.04] text-dim transition-colors duration-300 hover:border-primary/40 hover:text-ink"
+              className="grid size-11 place-items-center rounded-xl border border-line bg-white/[0.04] text-dim transition-colors duration-300 hover:border-primary/40 hover:text-ink active:border-primary/50 active:bg-primary/10"
             >
               {social.icon}
             </motion.a>
@@ -334,8 +334,8 @@ function BrandBlock() {
 
 function TopRow(): ReactNode {
   return (
-    <div className="container-x pt-12 md:pt-16">
-      <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[1.15fr_1fr_1fr_1fr] md:gap-8">
+    <div className="container-x pt-10 md:pt-16">
+      <div className="grid gap-8 sm:grid-cols-2 sm:gap-12 md:grid-cols-[1.15fr_1fr_1fr_1fr] md:gap-8">
         <BrandBlock />
         <LinkColumn title="explore" items={explore} delay={0.08} />
         <LinkColumn title="builds" items={builds} delay={0.16} />
@@ -347,7 +347,7 @@ function TopRow(): ReactNode {
 
 function BottomBar() {
   return (
-    <div className="container-x pb-8 pt-2">
+    <div className="container-x pb-8 pt-2" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
       <div className="flex flex-col items-center justify-between gap-4 border-t border-line pt-6 text-center md:flex-row md:text-left">
       <p className="flex flex-wrap items-center justify-center gap-x-2 font-mono text-xs text-dim md:justify-start">
         <span>© {YEAR} {profile.name} · LykCloud Pvt Ltd</span>
@@ -371,7 +371,7 @@ function BottomBar() {
             whileHover={{ y: -2, boxShadow: '0 8px 22px -8px rgba(109, 114, 195, 0.5)' }}
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring', stiffness: 420, damping: 22 }}
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-white/[0.03] px-4 py-2 font-mono text-xs text-dim transition-colors hover:border-primary/40 hover:text-ink"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-white/[0.03] px-4 py-2 font-mono text-xs text-dim transition-colors hover:border-primary/40 hover:text-ink active:border-primary/50 active:text-ink"
             style={{ boxShadow: '0 0 0 0 rgba(109, 114, 195, 0)' }}
           >
             <ArrowIcon className="h-3.5 w-3.5 -rotate-45" />
@@ -405,7 +405,7 @@ function ChannelCards({ seen }: { seen: boolean }) {
   }
 
   return (
-    <div className="mt-9 grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="mt-8 grid w-full max-w-3xl grid-cols-2 gap-2.5 sm:mt-9 sm:grid-cols-4 sm:gap-3">
       {channels.map((channel, i) => {
         const copiedNow = copied === channel.label
         const sub = copiedNow
@@ -415,7 +415,7 @@ function ChannelCards({ seen }: { seen: boolean }) {
             : channel.sub
         const shared = {
           'aria-label': `${channel.label} — ${copiedNow ? 'username copied' : sub}`,
-          className: 'cta-card group relative flex cursor-pointer flex-col items-center gap-2.5 rounded-2xl border border-line bg-white/[0.02] px-4 py-5 text-center',
+          className: 'cta-card group relative flex cursor-pointer flex-col items-center gap-2.5 rounded-2xl border border-line bg-white/[0.02] px-3 py-4 text-center sm:px-4 sm:py-5',
           style: { '--accent': channel.color } as CSSProperties,
           initial: false,
           animate: seen ? { opacity: 1, y: 0 } : { opacity: 0, y: 26 },

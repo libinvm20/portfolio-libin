@@ -18,7 +18,7 @@ function TickerRow({ items, activity = false, muted = false }: { items: string[]
 
 export default function Skills() {
   return (
-    <section id="skills" className="scroll-mt-24 overflow-hidden border-y border-line py-16 md:py-20">
+    <section id="skills" className="scroll-mt-24 overflow-hidden border-y border-line py-14 sm:py-16 md:py-20">
       <AnimatedContent
         distance={24}
         duration={0.7}
@@ -30,8 +30,8 @@ export default function Skills() {
           <span className="h-px flex-1 bg-line" />
           <span className="font-mono text-[0.66rem] uppercase tracking-[0.34em] text-dim">stack &amp; depth</span>
         </div>
-        <h2 className="section-title font-display">Skills &amp; knowledge</h2>
-        <p className="max-w-[62ch] text-sm text-[#c7bbe2] md:text-base">
+        <h2 className="section-title font-display text-balance">Skills &amp; knowledge</h2>
+        <p className="max-w-[62ch] text-pretty text-sm text-[#c7bbe2] md:text-base">
           Every language, framework and tool I know, rated by depth and tied to what
           actually ships — laid out so teams can read my stack at a glance.
         </p>
@@ -45,7 +45,7 @@ export default function Skills() {
         <SkillBars />
 
         {/* live GitHub footprint — the pie's receipts */}
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl border border-line bg-white/[0.02] px-5 py-3.5 text-center font-mono text-xs text-dim">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl border border-line bg-white/[0.02] px-4 py-3.5 text-center font-mono text-[0.7rem] leading-relaxed text-dim sm:px-5 sm:text-xs">
           <SiGithub className="size-4 shrink-0 text-ink/70" aria-hidden="true" />
           <span>
             straight from GitHub: <span className="text-ink/85">{githubAudit.originalRepos} original repos</span>

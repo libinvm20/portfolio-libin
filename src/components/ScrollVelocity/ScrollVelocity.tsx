@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   motion,
   useAnimationFrame,
@@ -151,7 +151,24 @@ function VelocityText({
     { clamp: false }
   );
   const copyRef = useRef<HTMLSpanElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const visibleRef = useRef(true);
   const copyWidth = useElementWidth(copyRef);
+
+  // Marquees are decorative and there are several of them (hero, skills, two
+  // footer strips). Only the ones on screen should spend frames on transforms.
+  useEffect(() => {
+    const element = rootRef.current;
+    if (!element || typeof IntersectionObserver === 'undefined') return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visibleRef.current = entry.isIntersecting;
+      },
+      { rootMargin: '160px 0px' }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   const x = useTransform(baseX, v => {
     if (copyWidth === 0) return '0px';
@@ -166,7 +183,8 @@ function VelocityText({
   useAnimationFrame((_t, delta) => {
     // Always animate. The site owner keeps their OS on "reduce motion" but has
     // explicitly asked for the marquees to move, so we do not honor the media
-    // query here.
+    // query here — but off-screen strips and background tabs still cost frames.
+    if (!visibleRef.current || document.hidden) return;
     const grab = drag.current;
     const seconds = Math.min(delta, 64) / 1000;
     const targetPace = grab.active || (pauseOnHover && hoveredRef.current) ? 0 : 1;
@@ -285,6 +303,7 @@ function VelocityText({
 
   return (
     <div
+      ref={rootRef}
       className={`${parallaxClassName} relative overflow-hidden`}
       style={{
         ...(draggable ? { cursor: 'grab', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'pan-y' } : {}),
@@ -333,6 +352,19 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
 }) => {
   const hoveredRef = useRef(false);
 
+  // Every copy is a full duplicate of the content (chips with icons, filters,
+  // shadows), so phones get the minimum that still covers the viewport.
+  const [compact, setCompact] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  );
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 640px)');
+    const onChange = () => setCompact(query.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+  const copies = compact ? Math.min(numCopies, 3) : numCopies;
+
   return (
     <section
       className="w-full"
@@ -352,7 +384,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           scrollContainerRef={scrollContainerRef}
           damping={damping}
           stiffness={stiffness}
-          numCopies={numCopies}
+          numCopies={copies}
           velocityMapping={velocityMapping}
           parallaxClassName={parallaxClassName}
           scrollerClassName={scrollerClassName}

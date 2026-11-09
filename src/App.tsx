@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { MotionConfig } from 'motion/react'
 import ClickSpark from './components/ClickSpark/ClickSpark'
 import Noise from './components/Noise/Noise'
 import CursorFX from './components/site/CursorFX'
@@ -22,18 +23,43 @@ import Footer from './components/site/Footer'
 //
 // Static hosts (Netlify / Vercel / GitHub Pages) also get public/404.html directly.
 
-function App() {
-  const [booted, setBooted] = useState(false)
+const BOOT_SESSION_KEY = 'libin:booted'
 
-  // The #boot shell in index.html only covers the pre-React gap. Once the real
-  // boot overlay (Waves canvas et al) is rendered, drop the shell.
+/* The intro is a one-time flourish: run it on the first page view of a
+   session, and never for visitors who asked the OS for reduced motion.
+   Repeat visits (and every internal reload) land straight on content. */
+function shouldSkipBoot(): boolean {
+  if (typeof window === 'undefined') return true
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true
+  try {
+    return window.sessionStorage.getItem(BOOT_SESSION_KEY) === '1'
+  } catch {
+    // storage blocked (private mode / embedded webview) — show the intro
+    return false
+  }
+}
+
+function App() {
+  const [booted, setBooted] = useState(shouldSkipBoot)
+
+  // The #boot shell in index.html only covers the pre-React gap. Once React
+  // owns the page, drop it.
   useEffect(() => {
     document.getElementById('boot')?.remove()
   }, [])
 
+  const finishBoot = () => {
+    try {
+      window.sessionStorage.setItem(BOOT_SESSION_KEY, '1')
+    } catch {
+      // storage unavailable — the intro simply runs again next visit
+    }
+    setBooted(true)
+  }
+
   return (
-    <>
-      {!booted && <BootScreen onDone={() => setBooted(true)} />}
+    <MotionConfig reducedMotion="user">
+      {!booted && <BootScreen onDone={finishBoot} />}
       <Navbar />
       <ClickSpark sparkColor="#a9a3d8" sparkSize={11} sparkRadius={30} sparkCount={9}>
         <main>
@@ -47,7 +73,7 @@ function App() {
       <Noise patternAlpha={7} patternRefreshInterval={3} className="z-[70] opacity-60 mix-blend-soft-light" />
       <CursorFX />
       <Footer />
-    </>
+    </MotionConfig>
   )
 }
 

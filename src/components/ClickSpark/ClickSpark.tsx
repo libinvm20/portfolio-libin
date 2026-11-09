@@ -67,6 +67,9 @@ export default function ClickSpark({
     };
 
     const onClick = (event: PointerEvent) => {
+      // Touch taps land on pointerdown too, so a scroll flick would spray
+      // sparks across the page — press feedback on touch lives in CSS.
+      if (event.pointerType === 'touch') return;
       spawn(event.clientX, event.clientY);
     };
 
